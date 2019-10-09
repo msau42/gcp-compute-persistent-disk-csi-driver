@@ -23,3 +23,5 @@ DriverInfo:
   SupportedMountOption:
     debug:
     nouid32:
+  SupportedSizeRange:
+    min: 5Gi
