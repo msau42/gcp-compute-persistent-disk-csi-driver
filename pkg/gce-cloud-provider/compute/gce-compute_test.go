@@ -238,6 +238,32 @@ func TestValidateExistingDisk(t *testing.T) {
 			diskType: hyperdisk,
 			wantErr:  true,
 		},
+		{
+			name:       "valid hyperdisk with empty requested access mode config - RWO allowed",
+			accessMode: "",
+			disk: &computebeta.Disk{
+				AccessMode: constants.GCEReadWriteOnceAccessMode,
+			},
+			diskType: hyperdisk,
+		},
+		{
+			name:       "invalid hyperdisk with empty requested access mode config - ROX disallowed",
+			accessMode: "",
+			disk: &computebeta.Disk{
+				AccessMode: constants.GCEReadOnlyManyAccessMode,
+			},
+			diskType: hyperdisk,
+			wantErr:  true,
+		},
+		{
+			name:       "invalid hyperdisk with empty requested access mode config - RWX disallowed",
+			accessMode: "",
+			disk: &computebeta.Disk{
+				AccessMode: constants.GCEReadWriteManyAccessMode,
+			},
+			diskType: hyperdisk,
+			wantErr:  true,
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			// Bootstrap correct disk
