@@ -2778,6 +2778,10 @@ func createSingleZoneDisk(ctx context.Context, cloudProvider gce.GCECompute, nam
 		return nil, fmt.Errorf("failed to insert zonal disk: %w", err)
 	}
 
+	// DO NOT MERGE testing only
+	// Return error to trigger retry
+	return nil, fmt.Errorf("msau injecting error into CreateVolume")
+
 	// failed to GetDisk, however the Disk may already be created, the error code should be non-Final
 	disk, err := cloudProvider.GetDisk(ctx, project, meta.ZonalKey(name, diskZone))
 	if err != nil {

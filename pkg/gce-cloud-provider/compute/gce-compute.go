@@ -83,10 +83,10 @@ var AttachDiskBackoff = wait.Backoff{
 // WaitForOpBackoff is backoff used to wait for Global, Regional or Zonal operation to complete.
 // Default values are similar to Poll every 2 minutes with 6 minute timeout.
 var WaitForOpBackoff = wait.Backoff{
-	Duration: 2 * time.Minute,
+	Duration: 1 * time.Second,
 	Factor:   0.0,
 	Jitter:   0.0,
-	Steps:    3,
+	Steps:    1,
 	Cap:      0}
 
 var WaitForLongRunningOpBackoff = wait.Backoff{
