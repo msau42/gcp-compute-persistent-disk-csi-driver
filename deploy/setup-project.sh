@@ -15,6 +15,7 @@
 # GCE_PD_SA_DIR: Directory to save the service account key
 # ENABLE_KMS: Enable Cloud KMS and configure IAM ACLs.
 # ENABLE_KMS_ADMIN: Add service account permissions to destroy Cloud KMS keys.
+# ENABLE_SA_GKE: (Optional) If true, grants GKE node roles to the service account.
 # CREATE_SA_KEY: (Optional) If true, creates a new service account key and
 #   exports it if creating a new service account
 # NODE_SERVICE_ACCOUNTS: (Optional) Comma-separated list of service accounts
@@ -24,7 +25,7 @@
 set -o nounset
 set -o errexit
 
-readonly PKGDIR="${GOPATH}/src/sigs.k8s.io/gcp-compute-persistent-disk-csi-driver"
+readonly PKGDIR="."
 
 source "${PKGDIR}/deploy/common.sh"
 
@@ -33,6 +34,7 @@ ensure_var GCE_PD_SA_NAME
 ensure_var ENABLE_KMS
 ensure_var ENABLE_KMS_ADMIN
 
+ENABLE_SA_DEV="${ENABLE_SA_DEV:-false}"
 # Allow the user to pass CREATE_SA_KEY=false to skip the SA key creation
 # Ensure the SA directory set, if we're creating the SA_KEY
 CREATE_SA_KEY="${CREATE_SA_KEY:-true}"
@@ -135,6 +137,14 @@ if [ "${ENABLE_KMS_ADMIN}" = true ];
 then
   gcloud services enable cloudkms.googleapis.com --project="${PROJECT}"
   gcloud projects add-iam-policy-binding "${PROJECT}" --member serviceAccount:"${IAM_NAME}" --role "roles/cloudkms.admin" --condition=None
+fi
+
+if [ "${ENABLE_SA_GKE}" = true ];
+then
+  # This is needed if you're deploying on a GKE cluster
+  gcloud projects add-iam-policy-binding $PROJECT \
+    --member="serviceAccount:${IAM_NAME}" \
+    --role=roles/container.defaultNodeServiceAccount
 fi
 
 # Export key if needed
